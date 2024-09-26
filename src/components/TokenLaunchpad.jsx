@@ -1,15 +1,11 @@
-import { createMint } from '@solana/spl-token';
-import { useWallet, useConnection} from '@solana/wallet-adapter-react';
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import { Keypair } from '@solana/web3.js';
+import { Keypair, SystemProgram, Transaction } from "@solana/web3.js";
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { MINT_SIZE, TOKEN_PROGRAM_ID, createInitializeMint2Instruction, createMint, getMinimumBalanceForRentExemptMint } from "@solana/spl-token"
 
 export function TokenLaunchpad() {
 
     const wallet = useWallet();
-    const connection = useConnection();
-
-
-
+    const {connection} = useConnection();
 
     async function createToken(){
         const name = document.getElementById("name").value;
@@ -32,9 +28,15 @@ export function TokenLaunchpad() {
             createInitializeMint2Instruction(keypair.publicKey, 9, wallet.publicKey, wallet.publicKey, TOKEN_PROGRAM_ID)
         );
 
+        
+        transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+        transaction.feePayer = await wallet.publicKey;
+        console.log(wallet.publicKey);
         transaction.partialSign(keypair);
-        const response = await wallet.sendTransaction(transaction);
+
+        const response = await wallet.sendTransaction(transaction,connection);
         console.log(response);
+        console.log(`Token mint created at ${keypair.publicKey.toBase58()}`)
 
     }
 
