@@ -34,7 +34,7 @@ export function TokenLaunchpad() {
         console.log(wallet.publicKey);
         transaction.partialSign(keypair);
 
-        const response = await wallet.sendTransaction(transaction,connection);
+        const response = await wallet.sendTransaction(transaction,connection)
         console.log(response);
         console.log(`Token mint created at ${keypair.publicKey.toBase58()}`)
 
